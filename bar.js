@@ -1,4 +1,4 @@
-var url = "https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/GDP-data.json"
+ url = "https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/GDP-data.json"
 
 var margin = {top: 50,bottom: 50,left: 50,  right: 50},
     h = 300 - margin.top - margin.bottom,
@@ -14,32 +14,48 @@ var margin = {top: 50,bottom: 50,left: 50,  right: 50},
 d3.json(url, function(data){  //Obtain Data from JSON url
 data = data.data;
 
+
+
+var timeParse = d3.timeParse("%Y-%m-%d");
+var formatDate = d3.timeFormat("%m/%y");
+console.log(timeParse(data[0][0]))
+
+
+
+
 var minDate = d3.min(data, function(d){return d[0]})
 var maxDate = d3.max(data, function(d){return d[0]})
 
-var x = d3.scaleBand()
-          .range([0, w])
-          .domain([minDate, maxDate])
-          .padding(0.2)
+var x = d3.scaleTime()
+            .domain([minDate, maxDate])
+            .range([0, w])
 
 
-console.log(minDate + " : "  + maxDate)
+
+        //   .range([0, w])
+        // .domain(data.map(function(d){return d[0]}))
+        //        .padding(0.2)
+        //  .domain(d3.extent(data, function(d){return d[0]}))
+
+//“x.domain(d3.extent(data, function(d) { return d.date; }))
+
+
 
 var y = d3.scaleLinear()
-            .domain([0, d3.max(data, function(d){return d[1]}) ])
+          .domain([0, d3.max(data, function(d){return d[1]}) ])
           .range([h, 0])
-
 
     svg.selectAll("rect").data(data).enter()
           .append("rect")
             .attr("height", function(d){return h - y(d[1])})
             .attr("y", function(d){return y(d[1])})
-            .attr("x", function(d){return x(d[0])})
-            .attr("width", data.length )
+            .attr("x", function(d, i){return i})
+            .attr("width", 10)
 
 svg.append("g").call(d3.axisLeft(y))
-svg.append("g").call(d3.axisBottom(x).ticks(5))
+svg.append("g").call(d3.axisBottom(x))
       .attr("transform", `translate(0, ${h})`)
+      .tickFormat(timeParse)
 
-  console.log(data)
+
 })
